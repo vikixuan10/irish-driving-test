@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱尔兰路考英语学习系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #5a67d8;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 15px 30px;
+            background: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-btn.active {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .category-tabs::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 3px;
+        }
+
+        .category-tabs::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .category-tab {
+            flex-shrink: 0;
+            padding: 12px 24px;
+            background: #f7fafc;
+            border: 2px solid transparent;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .category-tab:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-tab-icon {
+            font-size: 1.3em;
+        }
+
+        .category-tab-title {
+            font-size: 1em;
+        }
+
+        .category-tab-count {
+            font-size: 0.85em;
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 4px;
+        }
+
+        .command-list {
+            display: none;
+        }
+
+        .command-list.active {
+            display: block;
+        }
+
+        .command-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .command-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .command-type {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #5a67d8;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .command-english {
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .command-chinese {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .audio-controls {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .audio-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #5a67d8;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .audio-btn:hover {
+            background: #4c51bf;
+            transform: scale(1.1);
+        }
+
+        .audio-btn.playing {
+            background: #48bb78;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(72, 187, 120, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+            }
+        }
+
+        .quiz-area {
+            display: none;
+            text-align: center;
+        }
+
+        .quiz-question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #2d3748;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quiz-option {
+            padding: 20px;
+            background: #f7fafc;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: #edf2f7;
+            border-color: #5a67d8;
+        }
+
+        .quiz-option.correct {
+            background: #c6f6d5;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.incorrect {
+            background: #fed7d7;
+            border-color: #f56565;
+        }
+
+        .quiz-score {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #5a67d8;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .quiz-btn {
+            padding: 12px 30px;
+            background: #5a67d8;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover {
+            background: #4c51bf;
+            transform: translateY(-2px);
+        }
+
+        .speed-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .speed-label {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .speed-select {
+            padding: 5px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .category-tabs {
+                gap: 8px;
+                padding: 8px 0;
+            }
+            
+            .category-tab {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .category-tab-icon {
+                font-size: 1.1em;
+            }
+            
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .command-item {
+                padding-right: 60px;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 爱尔兰路考英语学习系统</h1>
+            <p class="subtitle">掌握官方口令，轻松通过路考</p>
+            <div id="voice-status" style="margin-top: 10px; font-size: 0.9em; color: #718096;"></div>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="showMode('learn')">
+                📚 学习模式
+            </button>
+            <button class="mode-btn" onclick="showMode('quiz-cn-en')">
+                🎯 中译英测验
+            </button>
+            <button class="mode-btn" onclick="showMode('quiz-en-cn')">
+                🎯 英译中测验
+            </button>
+        </div>
+
+        <div class="content-area">
+            <!-- 学习模式 -->
+            <div id="learn-mode" class="learn-area">
+                <div class="category-tabs" id="categoryTabs"></div>
+                <div id="commandContent"></div>
+            </div>
+
+            <!-- 测验模式 -->
+            <div id="quiz-mode" class="quiz-area">
+                <div class="quiz-score" id="quizScore">得分: 0 / 0</div>
+                <div class="quiz-question" id="quizQuestion"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+            </div>
+        </div>
+
+        <div class="speed-control">
+            <span class="speed-label">语速:</span>
+            <select class="speed-select" id="speechRate" onchange="updateSpeechRate()">
+                <option value="0.8">慢速</option>
+                <option value="1" selected>正常</option>
+                <option value="1.2">快速</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        // 数据结构
+        const categories = [
+            {
+                id: 'startup',
+                icon: '🔑',
+                title: '启动',
+                commands: [
+                    {
+                        english: 'Please start up the engine.',
+                        chinese: '请启动引擎。'
+                    },
+                    {
+                        english: 'Now, you should drive in your normal manner. I will tell you in good time when to turn left or right, otherwise you follow the course of the road. If you have any doubts about my directions, ask me to repeat or clarify them. You may start when you are ready.',
+                        chinese: '官方口令：现在请以正常方式驾驶。我会提前告诉你什么时候左转或右转，否则请沿路行驶。如果对指令有疑问，可以让我重复或解释。准备好后就可以出发。'
+                    }
+                ]
+            },
+            {
+                id: 'basic',
+                icon: '🛣️',
+                title: '道路基本行驶',
+                commands: [
+                    {
+                        english: 'At the next junction, turn right.',
+                        chinese: '在下一个路口右转。'
+                    },
+                    {
+                        english: 'At the traffic light, turn left.',
+                        chinese: '在红绿灯处左转。'
+                    },
+                    {
+                        english: 'Take the next road on the right, please.',
+                        chinese: '请在下一个岔路右转。'
+                    },
+                    {
+                        english: 'At the end of the road, turn left.',
+                        chinese: '在这条路的尽头左转。'
+                    },
+                    {
+                        english: 'Take the next right.',
+                        chinese: '在下一个路口右转。'
+                    },
+                    {
+                        english: 'Take the next left.',
+                        chinese: '在下一个路口左转。'
+                    },
+                    {
+                        english: 'Go straight ahead.',
+                        chinese: '直行。'
+                    },
+                    {
+                        english: 'Keep going straight ahead.',
+                        chinese: '继续直行。'
+                    }
+                ]
+            },
+            {
+                id: 'roundabout',
+                icon: '🔄',
+                title: '环岛行驶',
+                commands: [
+                    {
+                        english: 'At the roundabout, take the first exit.',
+                        chinese: '在环岛走第一个出口。'
+                    },
+                    {
+                        english: 'Take the first exit at the roundabout.',
+                        chinese: '在环岛走第一个出口。'
+                    },
+                    {
+                        english: 'At the roundabout, turn left.',
+                        chinese: '在环岛左转。'
+                    },
+                    {
+                        english: 'At the roundabout, take the second exit.',
+                        chinese: '在环岛走第二个出口。'
+                    },
+                    {
+                        english: 'Take the second exit at the roundabout.',
+                        chinese: '在环岛走第二个出口。'
+                    },
+                    {
+                        english: 'Go straight ahead at the roundabout.',
+                        chinese: '在环岛直行。'
+                    },
+                    {
+                        english: 'At the roundabout, take the third exit.',
+                        chinese: '在环岛走第三个出口。'
+                    },
+                    {
+                        english: 'At the roundabout, take the third exit on the right.',
+                        chinese: '在环岛的右侧走第三个出口。'
+                    },
+                    {
+                        english: 'Take the third exit at the roundabout.',
+                        chinese: '在环岛走第三个出口。'
+                    },
+                    {
+                        english: 'At the roundabout, turn right.',
+                        chinese: '在环岛右转。'
+                    }
+                ]
+            },
+            {
+                id: 'uturn',
+                icon: '↩️',
+                title: '掉头',
+                commands: [
+                    {
+                        english: 'I would like you to turn your car around on the road to face the opposite way. You may go over and back more than once if necessary. You may start when you are ready.',
+                        chinese: '官方口令：请将车在道路上掉头至相反方向。如有需要可前后多次调整。准备好后就开始。'
+                    },
+                    {
+                        english: 'Turn around your car and go back to where we came from.',
+                        chinese: '请将车掉头并原路返回。'
+                    },
+                    {
+                        english: "Let's do a turnabout.",
+                        chinese: '我们来做个掉头练习。'
+                    },
+                    {
+                        english: "Let's do a turnaround.",
+                        chinese: '我们来做个掉头练习。'
+                    },
+                    {
+                        english: "Let's do a three-point turn.",
+                        chinese: '我们来做一次三点掉头。'
+                    }
+                ]
+            },
+            {
+                id: 'reverse',
+                icon: '⬅️',
+                title: '倒车',
+                commands: [
+                    {
+                        english: 'This road on the left is the one I want you to reverse your vehicle into. Will you drive past it and stop on the left, and I will give you further directions.',
+                        chinese: '官方口令：我希望你倒车进入左边这条路。请先驶过路口然后靠左停车，我会再给你指示。'
+                    },
+                    {
+                        english: "Reverse into this road on the left. You should continue reversing, while it is safe to do so, keeping reasonably close to the left. I'll tell you when you have gone back far enough; you may start when you are ready.",
+                        chinese: '官方口令：请把车倒进左边这条路，在安全的情况下继续倒车，尽量靠近左侧。准备好后就开始，倒车到了足够时，我会告诉你。'
+                    },
+                    {
+                        english: 'Reverse around the corner.',
+                        chinese: '在转角处倒车。'
+                    },
+                    {
+                        english: 'Reverse around the corner into the road on the left.',
+                        chinese: '沿转角倒车进入左侧道路。'
+                    },
+                    {
+                        english: 'Reverse into the next road on the left.',
+                        chinese: '倒车进入下一个左边的路口。'
+                    }
+                ]
+            },
+            {
+                id: 'parking',
+                icon: '🅿️',
+                title: '靠边停车与起步',
+                commands: [
+                    {
+                        english: 'Pull up on the left in a safe place.',
+                        chinese: '请在安全的位置靠左停车。'
+                    },
+                    {
+                        english: 'Pull up on the left, please.',
+                        chinese: '请靠左停车。'
+                    },
+                    {
+                        english: 'Please move off.',
+                        chinese: '请起步。'
+                    },
+                    {
+                        english: "Move off when it's safe.",
+                        chinese: '安全时请起步。'
+                    },
+                    {
+                        english: 'Drive on when you are ready.',
+                        chinese: '准备好时请起步行驶。'
+                    },
+                    {
+                        english: "When it's safe, drive on.",
+                        chinese: '安全时请起步行驶。'
+                    },
+                    {
+                        english: 'Stop and move off again.',
+                        chinese: '停一下然后再起步（模拟临时停车再开）。'
+                    }
+                ]
+            },
+            {
+                id: 'finish',
+                icon: '🏁',
+                title: '结束前停车',
+                commands: [
+                    {
+                        english: 'Please find a suitable place and park.',
+                        chinese: '请找一个合适的位置停车。'
+                    }
+                ]
+            }
+        ];
+
+        // 全局变量
+        let currentMode = 'learn';
+        let currentCategory = null;
+        let quizMode = '';
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = 0;
+        let speechRate = 1;
+        let wrongAnswers = [];  // 存储错题
+
+        // 初始化
+        function init() {
+            renderCategoryTabs();
+            // 默认显示第一个分类
+            selectCategory(categories[0].id);
+            
+            // 初始化语音
+            if (window.speechSynthesis) {
+                // 加载语音列表
+                const loadVoices = () => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        console.log('可用语音数量:', voices.length);
+                        updateVoiceStatus();
+                    }
+                };
+                
+                loadVoices();
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                }
+            }
+        }
+
+        // 更新语音状态显示
+        function updateVoiceStatus() {
+            const statusEl = document.getElementById('voice-status');
+            const voices = speechSynthesis.getVoices();
+            const englishVoices = voices.filter(v => v.lang.includes('en'));
+            const premiumVoices = englishVoices.filter(v => 
+                v.name.includes('Google') || 
+                v.name.includes('Microsoft') || 
+                v.name.includes('Premium') || 
+                v.name.includes('Natural')
+            );
+            
+            if (premiumVoices.length > 0) {
+                statusEl.textContent = `✅ 使用高质量语音: ${premiumVoices[0].name}`;
+                statusEl.style.color = '#48bb78';
+            } else if (englishVoices.length > 0) {
+                statusEl.textContent = `🔊 使用系统语音: ${englishVoices[0].name}`;
+                statusEl.style.color = '#4299e1';
+            } else {
+                statusEl.textContent = '⚠️ 未检测到英语语音';
+                statusEl.style.color = '#e53e3e';
+            }
+        }
+
+        // 显示测验结果
+        function showQuizResult() {
+            const accuracy = totalQuestions > 0 ? Math.round(score/totalQuestions*100) : 0;
+            let resultHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="color: #5a67d8; margin-bottom: 20px;">测验完成！</h2>
+                    <div style="font-size: 3em; margin-bottom: 20px;">
+                        ${accuracy >= 80 ? '🎉' : accuracy >= 60 ? '👍' : '💪'}
+                    </div>
+                    <p style="font-size: 1.5em; margin-bottom: 10px;">
+                        得分: <strong>${score} / ${totalQuestions}</strong>
+                    </p>
+                    <p style="font-size: 1.3em; margin-bottom: 30px;">
+                        正确率: <strong>${accuracy}%</strong>
+                    </p>
+            `;
+            
+            if (wrongAnswers.length > 0) {
+                resultHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <button class="quiz-btn" onclick="showWrongAnswers()">查看错题 (${wrongAnswers.length})</button>
+                    </div>
+                `;
+            }
+            
+            resultHTML += `
+                    <div>
+                        <button class="quiz-btn" onclick="resetQuiz()">重新开始</button>
+                        <button class="quiz-btn" onclick="showMode('learn')">返回学习</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('quizQuestion').innerHTML = resultHTML;
+            document.getElementById('quizOptions').innerHTML = '';
+        }
+        
+        // 显示错题回顾
+        function showWrongAnswers() {
+            let wrongAnswersHTML = `
+                <div style="text-align: left;">
+                    <h2 style="color: #5a67d8; margin-bottom: 20px; text-align: center;">错题回顾</h2>
+            `;
+            
+            wrongAnswers.forEach((item, index) => {
+                const isChineseToEnglish = item.mode === 'quiz-cn-en';
+                wrongAnswersHTML += `
+                    <div style="background: #f7fafc; padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 4px solid #e53e3e;">
+                        <div style="font-weight: bold; margin-bottom: 10px; color: #2d3748;">
+                            ${index + 1}. ${isChineseToEnglish ? '中译英' : '英译中'}
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>题目：</strong>${isChineseToEnglish ? item.question.chinese : item.question.english}
+                        </div>
+                        <div style="margin-bottom: 10px; color: #e53e3e;">
+                            <strong>你的答案：</strong>${item.userAnswer} ❌
+                        </div>
+                        <div style="color: #48bb78;">
+                            <strong>正确答案：</strong><br>
+                            ${item.correctAnswers.map(ans => `• ${ans}`).join('<br>')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            wrongAnswersHTML += `
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="quiz-btn" onclick="showQuizResult()">返回结果</button>
+                        <button class="quiz-btn" onclick="resetQuiz()">重新开始</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('quizQuestion').innerHTML = wrongAnswersHTML;
+            document.getElementById('quizOptions').innerHTML = '';
+        }
+
+        // 渲染分类标签
+        function renderCategoryTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = categories.map(cat => `
+                <div class="category-tab" id="tab-${cat.id}" onclick="selectCategory('${cat.id}')">
+                    <span class="category-tab-icon">${cat.icon}</span>
+                    <span class="category-tab-title">${cat.title}</span>
+                    <span class="category-tab-count">${cat.commands.length}</span>
+                </div>
+            `).join('');
+        }
+
+        // 渲染指令内容
+        function renderCommandContent(categoryId) {
+            const category = categories.find(cat => cat.id === categoryId);
+            if (!category) return;
+
+            const container = document.getElementById('commandContent');
+            container.innerHTML = `
+                <h2 style="margin-bottom: 20px; color: #5a67d8; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5em;">${category.icon}</span>
+                    ${category.title}
+                </h2>
+                ${category.commands.map((cmd, index) => `
+                    <div class="command-item">
+                        <div class="command-english">${cmd.english}</div>
+                        <div class="command-chinese">${cmd.chinese}</div>
+                        <div class="audio-controls">
+                            <button class="audio-btn" onclick="playAudio('${category.id}-${index}', '${encodeURIComponent(cmd.english)}')">
+                                🔊
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // 选择分类
+        function selectCategory(catId) {
+            // 更新标签状态
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${catId}`).classList.add('active');
+
+            // 渲染对应的内容
+            renderCommandContent(catId);
+
+            currentCategory = catId;
+        }
+
+        // 播放音频
+        function playAudio(id, text) {
+            const btn = event.target;
+            
+            // 如果正在播放，先停止
+            if (btn.classList.contains('playing')) {
+                speechSynthesis.cancel();
+                btn.classList.remove('playing');
+                return;
+            }
+            
+            btn.classList.add('playing');
+            const decodedText = decodeURIComponent(text);
+            
+            const utterance = new SpeechSynthesisUtterance(decodedText);
+            
+            // 获取所有可用语音并选择最优质的
+            const voices = speechSynthesis.getVoices();
+            
+            // 优先级排序：寻找最优质的英语语音
+            const voicePriority = [
+                // 最高优先级：Google 的英语语音
+                voice => voice.name.includes('Google') && voice.lang.includes('en'),
+                // 次优先级：Microsoft 的英语语音
+                voice => voice.name.includes('Microsoft') && voice.lang.includes('en'),
+                // 第三优先级：标记为 Premium 或 Natural 的英语语音
+                voice => (voice.name.includes('Premium') || voice.name.includes('Natural')) && voice.lang.includes('en'),
+                // 第四优先级：英国或爱尔兰英语
+                voice => voice.lang === 'en-GB' || voice.lang === 'en-IE',
+                // 第五优先级：任何英语语音
+                voice => voice.lang.startsWith('en')
+            ];
+            
+            let selectedVoice = null;
+            for (const criterion of voicePriority) {
+                const matchingVoices = voices.filter(criterion);
+                if (matchingVoices.length > 0) {
+                    selectedVoice = matchingVoices[0];
+                    break;
+                }
+            }
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                console.log('使用语音:', selectedVoice.name);
+            }
+            
+            utterance.rate = speechRate;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            utterance.onend = () => {
+                btn.classList.remove('playing');
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('语音播放错误:', event);
+                btn.classList.remove('playing');
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+
+        // 停止所有音频
+        function stopAllAudio() {
+            speechSynthesis.cancel();
+            const playingButtons = document.querySelectorAll('.audio-btn.playing');
+            playingButtons.forEach(btn => btn.classList.remove('playing'));
+        }
+
+        // 更新语速
+        function updateSpeechRate() {
+            speechRate = parseFloat(document.getElementById('speechRate').value);
+        }
+
+        // 切换模式
+        function showMode(mode) {
+            currentMode = mode;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 显示对应内容
+            document.getElementById('learn-mode').style.display = 'none';
+            document.getElementById('quiz-mode').style.display = 'none';
+            
+            if (mode === 'learn') {
+                document.getElementById('learn-mode').style.display = 'block';
+            } else if (mode.startsWith('quiz')) {
+                document.getElementById('quiz-mode').style.display = 'block';
+                quizMode = mode;
+                startQuiz();
+            }
+        }
+
+        // 开始测验
+        function startQuiz() {
+            // 收集所有命令
+            quizQuestions = [];
+            
+            if (quizMode === 'quiz-cn-en') {
+                // 中译英：需要去重中文
+                const uniqueChinese = new Map();
+                categories.forEach(cat => {
+                    cat.commands.forEach(cmd => {
+                        if (!uniqueChinese.has(cmd.chinese)) {
+                            uniqueChinese.set(cmd.chinese, {
+                                english: cmd.english,
+                                chinese: cmd.chinese,
+                                category: cat.title
+                            });
+                        }
+                    });
+                });
+                quizQuestions = Array.from(uniqueChinese.values());
+            } else {
+                // 英译中：保留所有不同的英文句子
+                categories.forEach(cat => {
+                    cat.commands.forEach(cmd => {
+                        quizQuestions.push({
+                            english: cmd.english,
+                            chinese: cmd.chinese,
+                            category: cat.title
+                        });
+                    });
+                });
+            }
+            
+            // 随机打乱
+            quizQuestions.sort(() => Math.random() - 0.5);
+            
+            // 重置状态
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = 0;
+            
+            // 显示第一题
+            showQuestion();
+        }
+
+        // 显示题目
+        function showQuestion() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                // 测验结束
+                showQuizResult();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuestionIndex];
+            const isChineseToEnglish = quizMode === 'quiz-cn-en';
+            
+            // 显示题目
+            document.getElementById('quizQuestion').innerHTML = 
+                isChineseToEnglish ? 
+                `<strong>请选择正确的英文翻译:</strong><br>${question.chinese}` :
+                `<strong>请选择正确的中文翻译:</strong><br>${question.english}`;
+            
+            // 生成选项
+            let options = [];
+            
+            if (isChineseToEnglish) {
+                // 中译英：找出所有该中文对应的英文
+                const correctAnswers = quizQuestions
+                    .filter(q => q.chinese === question.chinese)
+                    .map(q => q.english);
+                
+                // 添加所有正确答案
+                options.push(...correctAnswers);
+                
+                // 添加其他错误选项，确保不重复
+                const wrongOptions = quizQuestions
+                    .filter(q => q.chinese !== question.chinese)
+                    .map(q => q.english)
+                    .filter(eng => !options.includes(eng))
+                    .sort(() => Math.random() - 0.5);
+                
+                // 补充到4个选项
+                while (options.length < 4 && wrongOptions.length > 0) {
+                    options.push(wrongOptions.shift());
+                }
+            } else {
+                // 英译中：确保包含正确答案
+                const correctAnswer = question.chinese;
+                options.push(correctAnswer);
+                
+                // 查找所有可能的同义答案
+                const allCorrectAnswers = categories
+                    .flatMap(cat => cat.commands)
+                    .filter(cmd => cmd.english === question.english)
+                    .map(cmd => cmd.chinese);
+                
+                // 添加其他同义答案（如果有）
+                allCorrectAnswers.forEach(answer => {
+                    if (!options.includes(answer)) {
+                        options.push(answer);
+                    }
+                });
+                
+                // 添加错误选项
+                const wrongOptions = categories
+                    .flatMap(cat => cat.commands)
+                    .filter(cmd => cmd.english !== question.english)
+                    .map(cmd => cmd.chinese)
+                    .filter(chi => !options.includes(chi))
+                    .sort(() => Math.random() - 0.5);
+                
+                // 补充到4个选项
+                while (options.length < 4 && wrongOptions.length > 0) {
+                    const wrongOption = wrongOptions.shift();
+                    if (!options.includes(wrongOption)) {
+                        options.push(wrongOption);
+                    }
+                }
+            }
+            
+            // 打乱选项顺序
+            options.sort(() => Math.random() - 0.5);
+            
+            // 获取第一个正确答案（用于兼容）
+            const firstCorrectAnswer = isChineseToEnglish ? 
+                quizQuestions.find(q => q.chinese === question.chinese).english :
+                question.chinese;
+            
+            // 渲染选项
+            document.getElementById('quizOptions').innerHTML = options.map((opt, index) => `
+                <div class="quiz-option" data-index="${index}">
+                    ${opt}
+                </div>
+            `).join('');
+            
+            // 添加点击事件监听器
+            document.querySelectorAll('.quiz-option').forEach((optElement, idx) => {
+                optElement.onclick = () => checkAnswer(idx, firstCorrectAnswer);
+            });
+            
+            // 如果是英译中，播放音频
+            if (!isChineseToEnglish) {
+                // 先停止任何正在播放的音频
+                speechSynthesis.cancel();
+                
+                setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(question.english);
+                    const voices = speechSynthesis.getVoices();
+                    const englishVoices = voices.filter(v => v.lang.includes('en'));
+                    if (englishVoices.length > 0) {
+                        utterance.voice = englishVoices[0];
+                    }
+                    utterance.rate = speechRate;
+                    speechSynthesis.speak(utterance);
+                }, 500);
+            }
+        }
+
+        // 检查答案
+        function checkAnswer(index, correctAnswer) {
+            const options = document.querySelectorAll('.quiz-option');
+            const selectedOption = options[index];
+            const selectedText = selectedOption.textContent.trim();
+            
+            totalQuestions++;
+            
+            // 获取当前题目
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            const isChineseToEnglish = quizMode === 'quiz-cn-en';
+            
+            let isCorrect = false;
+            let allCorrectAnswers = [];
+            
+            if (isChineseToEnglish) {
+                // 中译英：查找所有具有相同中文的答案
+                allCorrectAnswers = quizQuestions
+                    .filter(q => q.chinese === currentQuestion.chinese)
+                    .map(q => q.english);
+                
+                isCorrect = allCorrectAnswers.includes(selectedText);
+                
+                // 标记所有正确答案
+                options.forEach(opt => {
+                    const optText = opt.textContent.trim();
+                    if (allCorrectAnswers.includes(optText)) {
+                        opt.classList.add('correct');
+                    } else if (opt === selectedOption && !isCorrect) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+            } else {
+                // 英译中：查找所有具有相同英文的答案
+                allCorrectAnswers = quizQuestions
+                    .filter(q => q.english === currentQuestion.english)
+                    .map(q => q.chinese);
+                
+                isCorrect = allCorrectAnswers.includes(selectedText);
+                
+                // 标记所有正确答案
+                options.forEach(opt => {
+                    const optText = opt.textContent.trim();
+                    if (allCorrectAnswers.includes(optText)) {
+                        opt.classList.add('correct');
+                    } else if (opt === selectedOption && !isCorrect) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+            }
+            
+            if (isCorrect) {
+                score++;
+            } else {
+                // 记录错题
+                wrongAnswers.push({
+                    question: currentQuestion,
+                    userAnswer: selectedText,
+                    correctAnswers: allCorrectAnswers,
+                    mode: quizMode
+                });
+            }
+            
+            // 禁用所有选项
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            // 更新分数
+            document.getElementById('quizScore').textContent = `得分: ${score} / ${totalQuestions}`;
+            
+            // 根据答题结果决定跳转时间
+            const delay = isCorrect ? 200 : 2000;  // 正确200ms，错误2秒
+            setTimeout(() => {
+                nextQuestion();
+            }, delay);
+        }
+
+        // 下一题
+        function nextQuestion() {
+            // 停止当前音频
+            speechSynthesis.cancel();
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        // 重置测验
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = 0;
+            wrongAnswers = [];  // 清空错题记录
+            document.getElementById('quizScore').textContent = '得分: 0 / 0';
+            startQuiz();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
