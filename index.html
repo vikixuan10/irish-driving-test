@@ -86,11 +86,38 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding: 10px 0;
+            padding: 10px 30px 10px 10px;
             margin-bottom: 20px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: #cbd5e0 #f7fafc;
+            position: relative;
+        }
+
+        /* 滑动提示渐变 */
+        .category-tabs::after {
+            content: '›';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.95));
+            padding-left: 20px;
+            padding-right: 10px;
+            font-size: 28px;
+            color: #5a67d8;
+            pointer-events: none;
+            animation: pulse-arrow 2s ease-in-out infinite;
+        }
+
+        /* 当滑动到最右边时隐藏箭头 */
+        .category-tabs.scrolled-end::after {
+            opacity: 0;
+        }
+
+        @keyframes pulse-arrow {
+            0%, 100% { opacity: 0.6; transform: translateY(-50%) translateX(0); }
+            50% { opacity: 1; transform: translateY(-50%) translateX(3px); }
         }
 
         .category-tabs::-webkit-scrollbar {
@@ -666,19 +693,35 @@
             const statusEl = document.getElementById('voice-status');
             const voices = speechSynthesis.getVoices();
             const englishVoices = voices.filter(v => v.lang.includes('en'));
-            const premiumVoices = englishVoices.filter(v => 
-                v.name.includes('Google') || 
-                v.name.includes('Microsoft') || 
-                v.name.includes('Premium') || 
-                v.name.includes('Natural')
-            );
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             
-            if (premiumVoices.length > 0) {
-                statusEl.textContent = `✅ 使用高质量语音: ${premiumVoices[0].name}`;
+            // iOS 优选语音
+            const iOSPreferredVoices = ['Samantha', 'Daniel', 'Kate', 'Oliver', 'Ava', 'Susan', 'Zoe'];
+            
+            let selectedVoice = null;
+            
+            if (isIOS) {
+                // iOS 设备上寻找推荐语音
+                for (const preferredName of iOSPreferredVoices) {
+                    selectedVoice = englishVoices.find(v => v.name.includes(preferredName));
+                    if (selectedVoice) break;
+                }
+            }
+            
+            if (!selectedVoice) {
+                // 其他设备或没找到推荐语音
+                const premiumVoices = englishVoices.filter(v => 
+                    v.name.includes('Google') || 
+                    v.name.includes('Microsoft') || 
+                    v.name.includes('Premium') || 
+                    v.name.includes('Natural')
+                );
+                selectedVoice = premiumVoices[0] || englishVoices[0];
+            }
+            
+            if (selectedVoice) {
+                statusEl.textContent = `✅ 使用语音: ${selectedVoice.name}`;
                 statusEl.style.color = '#48bb78';
-            } else if (englishVoices.length > 0) {
-                statusEl.textContent = `🔊 使用系统语音: ${englishVoices[0].name}`;
-                statusEl.style.color = '#4299e1';
             } else {
                 statusEl.textContent = '⚠️ 未检测到英语语音';
                 statusEl.style.color = '#e53e3e';
@@ -772,6 +815,16 @@
                     <span class="category-tab-count">${cat.commands.length}</span>
                 </div>
             `).join('');
+            
+            // 监听滑动，当滑到最右边时隐藏箭头
+            tabsContainer.addEventListener('scroll', () => {
+                const maxScroll = tabsContainer.scrollWidth - tabsContainer.clientWidth;
+                if (tabsContainer.scrollLeft >= maxScroll - 10) {
+                    tabsContainer.classList.add('scrolled-end');
+                } else {
+                    tabsContainer.classList.remove('scrolled-end');
+                }
+            });
         }
 
         // 渲染指令内容
@@ -832,17 +885,29 @@
             // 获取所有可用语音并选择最优质的
             const voices = speechSynthesis.getVoices();
             
+            // iOS 设备优先选择非 Karen 的语音
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            // iOS 设备优先选择的语音列表
+            const iOSPreferredVoices = ['Samantha', 'Daniel', 'Kate', 'Oliver', 'Ava', 'Susan', 'Zoe'];
+            
             // 优先级排序：寻找最优质的英语语音
             const voicePriority = [
+                // iOS 设备上的特殊处理
+                voice => isIOS && iOSPreferredVoices.some(name => voice.name.includes(name)) && voice.lang.includes('en'),
                 // 最高优先级：Google 的英语语音
                 voice => voice.name.includes('Google') && voice.lang.includes('en'),
                 // 次优先级：Microsoft 的英语语音
                 voice => voice.name.includes('Microsoft') && voice.lang.includes('en'),
+                // iOS 设备上避免 Karen，优先选择其他英语语音
+                voice => isIOS && !voice.name.includes('Karen') && !voice.name.includes('Moira') && voice.lang.includes('en-'),
                 // 第三优先级：标记为 Premium 或 Natural 的英语语音
-                voice => (voice.name.includes('Premium') || voice.name.includes('Natural')) && voice.lang.includes('en'),
+                voice => (voice.name.includes('Premium') || voice.name.includes('Natural') || voice.name.includes('Enhanced')) && voice.lang.includes('en'),
                 // 第四优先级：英国或爱尔兰英语
                 voice => voice.lang === 'en-GB' || voice.lang === 'en-IE',
-                // 第五优先级：任何英语语音
+                // 第五优先级：任何非 Karen 的英语语音
+                voice => !voice.name.includes('Karen') && !voice.name.includes('Moira') && voice.lang.startsWith('en'),
+                // 最后选择：任何英语语音
                 voice => voice.lang.startsWith('en')
             ];
             
